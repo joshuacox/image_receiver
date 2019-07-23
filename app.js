@@ -1,6 +1,10 @@
 const http = require('http');
 const server = http.createServer((req, res) => {
-    res.end(`
+    if (req.method === 'POST') {
+        // Handle post info...
+    }
+    else {
+      res.end(`
         <!doctype html>
         <html>
         <body>
@@ -12,6 +16,7 @@ const server = http.createServer((req, res) => {
             </form>
         </body>
         </html>
-    `);
+      `);
+    }
 });
 server.listen(3000);

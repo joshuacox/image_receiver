@@ -13,6 +13,12 @@ run: clean .cid
 		-p 3000:3000 \
 		monitaur/image_receiver
 
+exec:
+	-docker exec -it `cat .cid` /bin/sh
+
+logs:
+	-docker logs `cat .cid`
+
 kill:
 	-docker kill `cat .cid`
 
