@@ -11,6 +11,7 @@ run: clean .cid
 		--cidfile=.cid \
 		-d \
 		-p 8080:8080 \
+		-v `pwd`/tmp:/tmp \
 		monitaur/image_receiver
 
 exec:
