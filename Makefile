@@ -10,7 +10,7 @@ run: clean .cid
 		-it \
 		--cidfile=.cid \
 		-d \
-		-p 3000:3000 \
+		-p 8080:8080 \
 		monitaur/image_receiver
 
 exec:

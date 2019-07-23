@@ -1,43 +1,28 @@
-const http = require('http');
-const { parse } = require('querystring');
+var formidable = require('formidable'),
+    http = require('http'),
+    util = require('util');
 
-const server = http.createServer((req, res) => {
-    if (req.method === 'POST') {
-        collectRequestData(req, result => {
-            console.log(result);
-            res.end(`Parsed data belonging to ${result.fname}`);
-        });
-    } 
-    else {
-        res.end(`
-            <!doctype html>
-            <html>
-            <body>
-                <form action="/" method="post">
-                    <input type="text" name="fname" /><br />
-                    <input type="number" name="age" /><br />
-                    <input type="file" name="photo" /><br />
-                    <button>Save</button>
-                </form>
-            </body>
-            </html>
-        `);
-    }
-});
-server.listen(3000);
+http.createServer(function(req, res) {
+  if (req.url == '/upload' && req.method.toLowerCase() == 'post') {
+    // parse a file upload
+    var form = new formidable.IncomingForm();
 
-function collectRequestData(request, callback) {
-    const FORM_URLENCODED = 'application/x-www-form-urlencoded';
-    if(request.headers['content-type'] === FORM_URLENCODED) {
-        let body = '';
-        request.on('data', chunk => {
-            body += chunk.toString();
-        });
-        request.on('end', () => {
-            callback(parse(body));
-        });
-    }
-    else {
-        callback(null);
-    }
-}
+    form.parse(req, function(err, fields, files) {
+      res.writeHead(200, {'content-type': 'text/plain'});
+      res.write('received upload:\n\n');
+      res.end(util.inspect({fields: fields, files: files}));
+    });
+
+    return;
+  }
+
+  // show a file upload form
+  res.writeHead(200, {'content-type': 'text/html'});
+  res.end(
+    '<form action="/upload" enctype="multipart/form-data" method="post">'+
+    '<input type="text" name="title"><br>'+
+    '<input type="file" name="upload" multiple="multiple"><br>'+
+    '<input type="submit" value="Upload">'+
+    '</form>'
+  );
+}).listen(8080);

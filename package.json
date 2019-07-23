@@ -1,0 +1,25 @@
+{
+  "name": "image_receiver",
+  "version": "1.0.0",
+  "description": "receive images",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/monitaur/image_receiver.git"
+  },
+  "keywords": [
+    "image"
+  ],
+  "author": "Joshua Edward McLaughlin Cox",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://gitlab.com/monitaur/image_receiver/issues"
+  },
+  "homepage": "https://gitlab.com/monitaur/image_receiver#readme",
+  "dependencies": {
+    "formidable": "^1.2.1"
+  }
+}
