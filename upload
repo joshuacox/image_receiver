@@ -1,0 +1,32 @@
+#!/bin/sh
+
+if [ $# -ne 2 ]; then
+  # Print usage
+  echo -n 'Error! wrong number of arguments'
+  echo " [$#]"
+  echo 'usage:'
+  echo "$0 THIS_TITLE THIS_IMAGE"
+  exit 1
+fi
+
+# Upload an image to this url
+THIS_URL=localhost:8080/upload
+# With this title
+THIS_TITLE=$(printf "title=%s" $1)
+# And this file
+if [ -f $2 ]; then
+  THIS_FILE=$(printf "image=@%s" $(realpath $2))
+else
+  echo second argument must be a file
+  exit 1
+fi
+
+main () {
+  echo curl -F $THIS_TITLE  -F $THIS_FILE $THIS_URL
+  curl \
+    -F "$THIS_TITLE" \
+    -F "$THIS_FILE" \
+    "$THIS_URL"
+}
+
+main
