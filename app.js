@@ -1,7 +1,28 @@
+const { parse } = require('querystring');
 const http = require('http');
+
+function collectRequestData(request, callback) {
+    const FORM_URLENCODED = 'application/x-www-form-urlencoded';
+    if(request.headers['content-type'] === FORM_URLENCODED) {
+        let body = '';
+        request.on('data', chunk => {
+            body += chunk.toString();
+        });
+        request.on('end', () => {
+            callback(parse(body));
+        });
+    }
+    else {
+        callback(null);
+    }
+}
+
 const server = http.createServer((req, res) => {
     if (req.method === 'POST') {
-        // Handle post info...
+      collectRequestData(req, result => {
+        console.log(result);
+        res.end(`Parsed data belonging to ${result.fname}`);
+      });
     }
     else {
       res.end(`
