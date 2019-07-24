@@ -1,7 +1,6 @@
 #!/bin/bash
 : ${WATCHER_DEBUG:=false}
-echo "Watching $1"
-ls -lh $1
+echo "Watching $1 on $(hostname)"
 
 mkindex () {
     export IMAGE_TO_SERVE=$1
@@ -11,7 +10,7 @@ mkindex () {
 inotifywait -m $1 -e close_write -e moved_to |
   while read path action file; do
     FILE_TYPE=$( file -b $path$file|cut -f1 -d, )
-    if [[ $FILE_TYPE == " JPEG image data" ]]; then
+    if [[ $FILE_TYPE == "JPEG image data" ]]; then
       echo "The file '$file' appeared in directory '$path' via '$action'"
       mv $path$file /srv/images/
       mkindex $file
