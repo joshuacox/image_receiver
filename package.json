@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@gitlab.com/monitaur/image_receiver.git"
+    "url": "git+ssh://git@github.com/joshuacox/image_receiver.git"
   },
   "keywords": [
     "image"
@@ -16,9 +16,9 @@
   "author": "Joshua Edward McLaughlin Cox",
   "license": "GPL-3.0-or-later",
   "bugs": {
-    "url": "https://gitlab.com/monitaur/image_receiver/issues"
+    "url": "https://github.com/joshuacox/image_receiver/issues"
   },
-  "homepage": "https://gitlab.com/monitaur/image_receiver#readme",
+  "homepage": "https://github.com/joshuacox/image_receiver#readme",
   "dependencies": {
     "formidable": "^1.2.1"
   }

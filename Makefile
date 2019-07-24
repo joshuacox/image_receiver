@@ -7,7 +7,7 @@ srv:
 	@mkdir -p srv/images
 
 build:
-	docker build -t monitaur/image_receiver .
+	docker build -t joshuacox/image_receiver .
 
 run: clean .cid
 
@@ -21,7 +21,7 @@ run: clean .cid
 		-u ${ID_U}:${ID_G} \
 		-p 8080:8080 \
 		-v `pwd`/tmp:/tmp \
-		monitaur/image_receiver
+		joshuacox/image_receiver
 
 exec:
 	-@docker exec -it `cat .cid` /bin/sh
@@ -71,7 +71,7 @@ serve_clean:
 watch: watch_build watch_clean .cid.watch
 
 watch_build:
-	@cd watcher; docker build -t monitaur/watcher .
+	@cd watcher; docker build -t joshuacox/watcher .
 
 watch_clean:
 	-@docker kill `cat .cid.watch`
@@ -94,4 +94,4 @@ watch_exec:
 		-v `pwd`/tmp:/tmp \
 		-v `pwd`/srv:/srv \
 		--cidfile=.cid.watch \
-		monitaur/watcher
+		joshuacox/watcher
