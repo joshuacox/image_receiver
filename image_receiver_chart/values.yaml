@@ -1,0 +1,52 @@
+# Default values for image_receiver.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: joshuacox/image_receiver
+  listener_tag: listener
+  server_tag: server
+  watcher_tag: watcher
+  pullPolicy: Always
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+server_template: default
+#server_basic_auth_user: user
+#server_basic_auth_password: password
+
+service:
+  type: ClusterIP
+  port: 80
+
+data:
+  persistence:
+    enabled: true
+    accessMode: ReadWriteOnce
+    name: data
+    tmpname: tmp
+    srvname: srv
+    size: "30Gi"
+    # storageClass: "ssd"
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

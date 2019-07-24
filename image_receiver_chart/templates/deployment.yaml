@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "image_receiver.listenername" . }}
+  labels:
+{{ include "image_receiver.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "image_receiver.listenername" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "image_receiver.listenername" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}-listener
+          image: "{{ .Values.image.repository }}:{{ .Values.image.listener_tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          - mountPath: /tmp
+            name: tmp
+        - name: {{ .Chart.Name }}-watcher
+          image: "{{ .Values.image.repository }}:{{ .Values.image.watcher_tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          - mountPath: /tmp
+            name: tmp
+          - mountPath: /srv
+            name: srv
+        - name: {{ .Chart.Name }}-server
+          image: "{{ .Values.image.repository }}:{{ .Values.image.server_tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          - mountPath: /srv
+            name: srv
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+  {{- if .Values.data.persistence.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: tmp
+    spec:
+      accessModes:
+        - {{ .Values.data.persistence.accessMode | quote }}
+    {{- if .Values.data.persistence.storageClass }}
+    {{- if (eq "-" .Values.data.persistence.storageClass) }}
+      storageClassName: ""
+    {{- else }}
+      storageClassName: "{{ .Values.data.persistence.storageClass }}"
+    {{- end }}
+    {{- end }}
+      resources:
+        requests:
+          storage: "{{ .Values.data.persistence.size }}"
+  - metadata:
+      name: srv
+    spec:
+      accessModes:
+        - {{ .Values.data.persistence.accessMode | quote }}
+    {{- if .Values.data.persistence.storageClass }}
+    {{- if (eq "-" .Values.data.persistence.storageClass) }}
+      storageClassName: ""
+    {{- else }}
+      storageClassName: "{{ .Values.data.persistence.storageClass }}"
+    {{- end }}
+    {{- end }}
+      resources:
+        requests:
+          storage: "{{ .Values.data.persistence.size }}"
+  {{- end }}

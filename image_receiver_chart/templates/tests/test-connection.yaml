@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "image_receiver.fullname" . }}-test-connection"
+  labels:
+{{ include "image_receiver.labels" . | indent 4 }}
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args:  ['{{ include "image_receiver.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never
