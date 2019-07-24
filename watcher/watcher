@@ -1,4 +1,5 @@
 #!/bin/bash
+: ${WATCHER_DEBUG:=false}
 echo "Watching $1"
 ls -lh $1
 
@@ -9,7 +10,19 @@ mkindex () {
 
 inotifywait -m $1 -e close_write -e moved_to |
   while read path action file; do
-    echo "The file '$file' appeared in directory '$path' via '$action'"
-    mv $path$file /srv/images/
-    mkindex $file
+    FILE_TYPE=$( file $path$file|cut -f2 -d:|cut -f1 -d, )
+    if [[ $FILE_TYPE == " JPEG image data" ]]; then
+      echo "The file '$file' appeared in directory '$path' via '$action'"
+      mv $path$file /srv/images/
+      mkindex $file
+    else
+      echo -n "file type was '$FILE_TYPE', "
+      echo -n "$file Not JPEG, "
+      if [[ $WATCHER_DEBUG == true ]]; then
+        echo "retaining in tmp fur further inspection. "
+      else
+        echo -n "throwing away. "
+        rm -v $path$file
+      fi
+    fi
   done
