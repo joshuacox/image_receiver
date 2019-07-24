@@ -1,0 +1,17 @@
+#!/bin/bash
+echo "Watching $1"
+ls -lh $1
+
+mkindex () {
+    echo "<html>" > /srv/index.html
+    echo "<img src=./images/$2></img>" >> /srv/index.html
+    echo "</html>" >> /srv/index.html
+}
+
+inotifywait -m $1 -e close_write -e moved_to |
+  while read path action file; do
+    echo "The file '$file' appeared in directory '$path' via '$action'"
+    echo "mkindex $1 $file"
+    mv $path$file /srv/images/
+    mkindex $1 $file
+  done

@@ -1,4 +1,10 @@
-all: build run
+all: tmp srv build run watch serve
+
+tmp:
+	@mkdir tmp
+
+srv:
+	@mkdir -p srv/images
 
 build:
 	docker build -t monitaur/image_receiver .
@@ -6,28 +12,31 @@ build:
 run: clean .cid
 
 .cid:
+	$(eval ID_U := $(shell id -u))
+	$(eval ID_G := $(shell id -g))
 	docker run \
 		-it \
 		--cidfile=.cid \
 		-d \
+		-u ${ID_U}:${ID_G} \
 		-p 8080:8080 \
 		-v `pwd`/tmp:/tmp \
 		monitaur/image_receiver
 
 exec:
-	-docker exec -it `cat .cid` /bin/sh
+	-@docker exec -it `cat .cid` /bin/sh
 
 logs:
-	-docker logs `cat .cid`
+	-@docker logs `cat .cid`
 
 kill:
-	-docker kill `cat .cid`
+	-@docker kill `cat .cid`
 
 rm:
-	-docker rm `cat .cid`
-	-rm .cid
+	-@docker rm `cat .cid`
+	-@rm .cid
 
-clean: kill rm
+clean: kill rm watch_clean serve_clean
 
 tensorflow: .cid.tf
 
@@ -36,10 +45,53 @@ tensorflow: .cid.tf
 	$(eval ID_G := $(shell id -g))
 	docker run \
 		-it \
-		--cidfile=.cid.tf \
 		-p 8888:8888 \
+		--cidfile=.cid.tf \
 		-v `pwd`/tmp:/tmp \
 		-u ${ID_U}:${ID_G} \
 		tensorflow/tensorflow:latest-py3-jupyter \
 		/bin/bash
 
+serve: serve_clean .cid.nginx
+
+.cid.nginx:
+	docker run \
+		-d \
+		-it \
+		-p 8081:80 \
+		-v `pwd`/srv:/usr/share/nginx/html:ro \
+		--cidfile=.cid.nginx \
+		nginx:alpine
+
+serve_clean:
+	-@docker kill `cat .cid.nginx`
+	-@docker rm `cat .cid.nginx`
+	-@rm .cid.nginx
+
+watch: watch_build watch_clean .cid.watch
+
+watch_build:
+	@cd watcher; docker build -t monitaur/watcher .
+
+watch_clean:
+	-@docker kill `cat .cid.watch`
+	-@docker rm `cat .cid.watch`
+	-@rm .cid.watch
+
+watch_logs:
+	-@docker logs `cat .cid.watch`
+
+watch_exec:
+	-@docker exec -it `cat .cid.watch` /bin/bash
+
+.cid.watch:
+	$(eval ID_U := $(shell id -u))
+	$(eval ID_G := $(shell id -g))
+	docker run \
+		-d \
+		-it \
+		-u ${ID_U}:${ID_G} \
+		-v `pwd`/tmp:/tmp \
+		-v `pwd`/srv:/srv \
+		--cidfile=.cid.watch \
+		monitaur/watcher

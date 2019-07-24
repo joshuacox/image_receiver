@@ -1,4 +1,7 @@
 .cid
 .cid.tf
+.cid.nginx
+.cid.watch
 node_modules
 tmp
+srv

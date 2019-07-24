@@ -6,6 +6,8 @@ http.createServer(function(req, res) {
   if (req.url == '/upload' && req.method.toLowerCase() == 'post') {
     // parse a file upload
     var form = new formidable.IncomingForm();
+    form.keepExtensions = true;
+    form.hash = 'sha1';
 
     form.parse(req, function(err, fields, files) {
       res.writeHead(200, {'content-type': 'text/plain'});
