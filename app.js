@@ -1,27 +1,41 @@
-var formidable = require('formidable'),
-    http = require('http'),
-    util = require('util');
+const express = require('express');
+const fileUpload = require('../lib/index');
+const app = express();
 
-http.createServer(function(req, res) {
-  if (req.url == '/upload' && req.method.toLowerCase() == 'post') {
-    // parse a file upload
-    var form = new formidable.IncomingForm();
-    form.keepExtensions = true;
-    form.hash = 'sha1';
+const PORT = 8000;
+app.use('/form', express.static(__dirname + '/index.html'));
 
-    form.parse(req, function(err, fields, files) {
-      res.writeHead(200, {'content-type': 'text/json'});
-      res.write('{"receivedUpload":"ok"}\n');
-      //res.end(util.inspect({fields: fields, files: files}));
-      res.end('\n ');
-    });
+// default options
+app.use(fileUpload());
 
+app.get('/ping', function(req, res) {
+  res.send('pong');
+});
+
+app.post('/upload', function(req, res) {
+  let sampleFile;
+  let uploadPath;
+
+  if (Object.keys(req.files).length == 0) {
+    res.status(400).send('No files were uploaded.');
     return;
   }
 
-  // show a file upload form
-  res.writeHead(200, {'content-type': 'text/html'});
-  res.end(
-    '<a href=example.com></a>'
-  );
-}).listen(8080);
+  console.log('req.files >>>', req.files); // eslint-disable-line
+
+  sampleFile = req.files.sampleFile;
+
+  uploadPath = __dirname + '/uploads/' + sampleFile.name;
+
+  sampleFile.mv(uploadPath, function(err) {
+    if (err) {
+      return res.status(500).send(err);
+    }
+
+    res.send('File uploaded to ' + uploadPath);
+  });
+});
+
+app.listen(PORT, function() {
+  console.log('Express server listening on port ', PORT); // eslint-disable-line
+});

@@ -10,9 +10,9 @@ if [ $# -ne 2 ]; then
 fi
 
 # Upload an image to this url
-THIS_URL=$(cat .host):$(cat .port)/upload
+THIS_URL=$(cat .host):$(cat .port)/receiver.php
 # With this title
-THIS_TITLE=$(printf "title=%s" $1)
+THIS_TITLE=$(printf "name=%s" $1)
 # And this file
 if [ -f $2 ]; then
   THIS_FILE=$(printf "image=@%s" $(realpath $2))

@@ -2,12 +2,18 @@ all: tmp srv build run watch serve
 
 tmp:
 	@mkdir tmp
+	@chmod 777 tmp
 
 srv:
 	@mkdir -p srv/images
 
-build:
+build: buildphp
+
+buildjs:
 	docker build -t joshuacox/image_receiver .
+
+buildphp:
+	docker build -t joshuacox/image_receiver:phplistenerfff -f ./Dockerfile.php .
 
 run: clean .cid
 
@@ -18,10 +24,11 @@ run: clean .cid
 		-it \
 		--cidfile=.cid \
 		-d \
-		-u ${ID_U}:${ID_G} \
-		-p `cat .port`:8080 \
-		-v `pwd`/tmp:/tmp \
-		joshuacox/image_receiver
+		-p `cat .port`:80 \
+		-v `pwd`/tmp:/var/www/html/tmp \
+		joshuacox/image_receiver:phplistenerfff
+
+		#-u ${ID_U}:${ID_G} \
 
 exec:
 	-@docker exec -it `cat .cid` /bin/sh
@@ -98,6 +105,7 @@ watch_exec:
 		-u ${ID_U}:${ID_G} \
 		-v `pwd`/tmp:/tmp \
 		-v `pwd`/srv:/srv \
+		-e 'WATCHER_DEBUG=true' \
 		--cidfile=.cid.watch \
 		joshuacox/watcher
 
