@@ -19,7 +19,7 @@ run: clean .cid
 		--cidfile=.cid \
 		-d \
 		-u ${ID_U}:${ID_G} \
-		-p 8080:8080 \
+		-p `cat .port`:8080 \
 		-v `pwd`/tmp:/tmp \
 		joshuacox/image_receiver
 
