@@ -9,9 +9,9 @@ mkindex () {
 
 inotifywait -m $1 -e close_write -e moved_to |
   while read path action file; do
+    echo "The file '$file' appeared in directory '$path' via '$action'"
     FILE_TYPE=$( file -b $path$file|cut -f1 -d, )
     if [[ $FILE_TYPE == "JPEG image data" ]]; then
-      echo "The file '$file' appeared in directory '$path' via '$action'"
       mv $path$file /srv/images/
       mkindex $file
     else

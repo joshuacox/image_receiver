@@ -7,22 +7,33 @@ tmp:
 srv:
 	@mkdir -p srv/images
 
-build: buildphp
+CURRENT_LANG=python
+
+build: build${CURRENT_LANG}
+exec: ${CURRENT_LANG}exec
+logs: ${CURRENT_LANG}logs
+kill: ${CURRENT_LANG}kill
+rm: ${CURRENT_LANG}rm
 
 buildjs:
-	docker build -t joshuacox/image_receiver .
+	docker build -t joshuacox/image_receiver:jslistener -f Dockerfile.js .
 
 buildphp:
 	docker build -t joshuacox/image_receiver:phplistener -f ./Dockerfile.php .
 
-run: clean .cid
+buildpython:
+	docker build -t joshuacox/image_receiver:pythonlistener -f ./Dockerfile.python .
 
-.cid: .port
+run: clean .cid.${CURRENT_LANG}
+
+php: .cid.php
+
+.cid.php: .port
 	$(eval ID_U := $(shell id -u))
 	$(eval ID_G := $(shell id -g))
 	docker run \
 		-it \
-		--cidfile=.cid \
+		--cidfile=.cid.php \
 		-d \
 		-p `cat .port`:80 \
 		-v `pwd`/tmp:/var/www/html/tmp \
@@ -30,18 +41,69 @@ run: clean .cid
 
 		#-u ${ID_U}:${ID_G} \
 
-exec:
-	-@docker exec -it `cat .cid` /bin/sh
+.cid.js: .port
+	$(eval ID_U := $(shell id -u))
+	$(eval ID_G := $(shell id -g))
+	docker run \
+		-it \
+		--cidfile=.cid.js \
+		-d \
+		-u ${ID_U}:${ID_G} \
+		-p `cat .port`:8080 \
+		-v `pwd`/tmp:/tmp \
+		joshuacox/image_receiver:jslistener
 
-logs:
-	-@docker logs `cat .cid`
+.cid.python: .port
+	$(eval ID_U := $(shell id -u))
+	$(eval ID_G := $(shell id -g))
+	docker run \
+		-it \
+		--cidfile=.cid.python \
+		-d \
+		-u ${ID_U}:${ID_G} \
+		-p `cat .port`:8888 \
+		-v `pwd`/tmp:/tmp \
+		joshuacox/image_receiver:pythonlistener
 
-kill:
-	-@docker kill `cat .cid`
 
-rm:
-	-@docker rm `cat .cid`
-	-@rm .cid
+${CURRENT_LANG}exec:
+	-@docker exec -it `cat .cid.${CURRENT_LANG}` /bin/sh
+
+${CURRENT_LANG}logs:
+	-@docker logs `cat .cid.${CURRENT_LANG}`
+
+${CURRENT_LANG}kill:
+	-@docker kill `cat .cid.${CURRENT_LANG}`
+
+${CURRENT_LANG}rm:
+	-@docker rm `cat .cid.${CURRENT_LANG}`
+	-@rm .cid.${CURRENT_LANG}
+
+pyexec:
+	-@docker exec -it `cat .cid.python` /bin/sh
+
+pylogs:
+	-@docker logs `cat .cid.python`
+
+pykill:
+	-@docker kill `cat .cid.python`
+
+pyrm:
+	-@docker rm `cat .cid.python`
+	-@rm .cid.python
+
+jsexec:
+	-@docker exec -it `cat .cid.js` /bin/sh
+
+jslogs:
+	-@docker logs `cat .cid.js`
+
+jskill:
+	-@docker kill `cat .cid.js`
+
+jsrm:
+	-@docker rm `cat .cid.js`
+	-@rm .cid.js
 
 clean: kill rm watch_clean serve_clean
 

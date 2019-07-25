@@ -7,6 +7,8 @@ See file_uploader.py in this directory for code that uploads files in this forma
 """
 
 import logging
+import tempfile
+import shutil
 
 try:
     from urllib.parse import unquote
@@ -17,6 +19,9 @@ except ImportError:
 import tornado.ioloop
 import tornado.web
 from tornado import options
+
+TMP_DIR = "/dev/shm"
+UPLOAD_DIR = "/tmp"
 
 
 class POSTHandler(tornado.web.RequestHandler):
@@ -36,16 +41,20 @@ class POSTHandler(tornado.web.RequestHandler):
 class PUTHandler(tornado.web.RequestHandler):
     def initialize(self):
         self.bytes_read = 0
+        self.file = tempfile.NamedTemporaryFile(dir=TMP_DIR)
 
     def data_received(self, chunk):
         self.bytes_read += len(chunk)
+        self.file.write(chunk)
 
     def put(self, filename):
         filename = unquote(filename)
         mtype = self.request.headers.get("Content-Type")
         logging.info('PUT "%s" "%s" %d bytes', filename, mtype, self.bytes_read)
-        self.write("OK")
-
+        self.file.flush()
+        shutil.copyfile(self.file.name, UPLOAD_DIR + "/" + filename)
+        self.file.close()
+        self.write('{"status":"OK"}')
 
 def make_app():
     return tornado.web.Application([(r"/post", POSTHandler), (r"/(.*)", PUTHandler)])
@@ -55,5 +64,5 @@ if __name__ == "__main__":
     # Tornado configures logging.
     options.parse_command_line()
     app = make_app()
-    app.listen(80)
+    app.listen(8888)
     tornado.ioloop.IOLoop.current().start()

@@ -10,7 +10,7 @@ if [ $# -ne 2 ]; then
 fi
 
 # Upload an image to this url
-THIS_URL=$(cat .host):$(cat .port)/receiver.php
+THIS_URL=$(cat .host):$(cat .port)/post
 # With this title
 THIS_TITLE=$(printf "name=%s" $1)
 # And this file
@@ -23,7 +23,7 @@ fi
 
 main () {
   echo curl -F $THIS_TITLE  -F $THIS_FILE $THIS_URL
-  curl \
+  curl -v \
     -F "$THIS_TITLE" \
     -F "$THIS_FILE" \
     "$THIS_URL"
