@@ -7,3 +7,6 @@ tmp
 srv
 .port
 .port.srv
+.user
+.pass
+.host

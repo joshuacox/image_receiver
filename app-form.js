@@ -21,6 +21,10 @@ http.createServer(function(req, res) {
   // show a file upload form
   res.writeHead(200, {'content-type': 'text/html'});
   res.end(
-    '<a href=example.com></a>'
+    '<form action="/upload" enctype="multipart/form-data" method="post">'+
+    '<input type="text" name="title"><br>'+
+    '<input type="file" name="upload" multiple="multiple"><br>'+
+    '<input type="submit" value="Upload">'+
+    '</form>'
   );
 }).listen(8080);

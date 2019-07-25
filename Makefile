@@ -54,14 +54,19 @@ tensorflow: .cid.tf
 
 serve: serve_clean .cid.nginx
 
-.cid.nginx: .port.srv
+.cid.nginx: .port.srv .user .pass .host
 	docker run \
 		-d \
 		-it \
+		-e 'NGINX_TEMPLATE=default' \
+		-e "NGINX_AUTH=true" \
+		-e "NGINX_USER=`cat .user`" \
+		-e "NGINX_PASS=`cat .pass`" \
 		-p `cat .port.srv`:80 \
 		-v `pwd`/srv:/usr/share/nginx/html:ro \
 		--cidfile=.cid.nginx \
-		nginx:alpine
+		webhostingcoopteam/nginx-tiny-proxy
+
 
 serve_clean:
 	-@docker kill `cat .cid.nginx`
@@ -104,4 +109,19 @@ watch_exec:
 .port:
 	@while [ -z "$$PORTLISTENER" ]; do \
 		read -r -p "Enter the port you wish to associate with this listener container [PORTLISTENER]: " PORTLISTENER; echo "$$PORTLISTENER">>.port; cat .port; \
+	done ;
+
+.user:
+	@while [ -z "$$NGINX_USER" ]; do \
+		read -r -p "Enter the user you wish to associate with this server container [NGINX_USER]: " NGINX_USER; echo "$$NGINX_USER">>.user; cat .user; \
+	done ;
+
+.host:
+	@while [ -z "$$HOST" ]; do \
+		read -r -p "Enter the host you wish to associate with this server container [HOST]: " HOST; echo "$$HOST">>.host; cat .host; \
+	done ;
+
+.pass:
+	@while [ -z "$$NGINX_PASS" ]; do \
+		read -r -p "Enter the pass you wish to associate with this server container [NGINX_PASS]: " NGINX_PASS; echo "$$NGINX_PASS">>.pass; cat .pass; \
 	done ;
