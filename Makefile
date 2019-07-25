@@ -11,7 +11,7 @@ build:
 
 run: clean .cid
 
-.cid:
+.cid: .port
 	$(eval ID_U := $(shell id -u))
 	$(eval ID_G := $(shell id -g))
 	docker run \
@@ -54,11 +54,11 @@ tensorflow: .cid.tf
 
 serve: serve_clean .cid.nginx
 
-.cid.nginx:
+.cid.nginx: .port.srv
 	docker run \
 		-d \
 		-it \
-		-p 8081:80 \
+		-p `cat .port.srv`:80 \
 		-v `pwd`/srv:/usr/share/nginx/html:ro \
 		--cidfile=.cid.nginx \
 		nginx:alpine
@@ -95,3 +95,13 @@ watch_exec:
 		-v `pwd`/srv:/srv \
 		--cidfile=.cid.watch \
 		joshuacox/watcher
+
+.port.srv:
+	@while [ -z "$$PORTSRV" ]; do \
+		read -r -p "Enter the port you wish to associate with this server container [PORTSRV]: " PORTSRV; echo "$$PORTSRV">>.port.srv; cat .port.srv; \
+	done ;
+
+.port:
+	@while [ -z "$$PORTLISTENER" ]; do \
+		read -r -p "Enter the port you wish to associate with this listener container [PORTLISTENER]: " PORTLISTENER; echo "$$PORTLISTENER">>.port; cat .port; \
+	done ;
