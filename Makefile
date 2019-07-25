@@ -13,7 +13,7 @@ buildjs:
 	docker build -t joshuacox/image_receiver .
 
 buildphp:
-	docker build -t joshuacox/image_receiver:phplistenerfff -f ./Dockerfile.php .
+	docker build -t joshuacox/image_receiver:phplistener -f ./Dockerfile.php .
 
 run: clean .cid
 
@@ -26,7 +26,7 @@ run: clean .cid
 		-d \
 		-p `cat .port`:80 \
 		-v `pwd`/tmp:/var/www/html/tmp \
-		joshuacox/image_receiver:phplistenerfff
+		joshuacox/image_receiver:phplistener
 
 		#-u ${ID_U}:${ID_G} \
 
