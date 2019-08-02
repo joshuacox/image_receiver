@@ -19,7 +19,7 @@ inotifywait -m $1 -e close_write -e moved_to |
       echo -n "file type was '$FILE_TYPE', "
       echo -n "$file Not JPEG, "
       if [[ $WATCHER_DEBUG == true ]]; then
-        echo "retaining in tmp fur further inspection. "
+        echo "retaining in tmp for further inspection. "
       else
         echo -n "throwing away. "
         rm -v $path$file
