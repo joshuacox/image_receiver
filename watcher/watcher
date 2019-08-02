@@ -13,6 +13,7 @@ inotifywait -m $1 -e close_write -e moved_to |
     echo "The file '$file' appeared in directory '$path' via '$action'"
     FILE_TYPE=$( file -b $path$file|cut -f1 -d, )
     if [[ $FILE_TYPE == "JPEG image data" ]]; then
+      cp $path$file /opencvUploads/
       mv $path$file /srv/images/
       mkindex $file
     else

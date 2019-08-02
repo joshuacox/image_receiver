@@ -1,4 +1,4 @@
-all: tmp srv build run watch serve
+all: opencvUploads tmp srv build run watch serve opencv
 
 tmp:
 	@mkdir tmp
@@ -6,6 +6,9 @@ tmp:
 
 srv:
 	@mkdir -p srv/images
+
+opencvUploads:
+	@mkdir -p opencvUploads
 
 CURRENT_LANG=python
 
@@ -105,7 +108,7 @@ jsrm:
 	-@docker rm `cat .cid.js`
 	-@rm .cid.js
 
-clean: kill rm watch_clean serve_clean
+clean: kill rm watch_clean serve_clean opencv_clean
 
 tensorflow: .cid.tf
 
@@ -165,11 +168,40 @@ watch_exec:
 		-d \
 		-it \
 		-u ${ID_U}:${ID_G} \
+		-v `pwd`/opencvUploads:/opencvUploads \
 		-v `pwd`/tmp:/tmp \
 		-v `pwd`/srv:/srv \
 		-e 'WATCHER_DEBUG=true' \
 		--cidfile=.cid.watch \
 		joshuacox/watcher
+
+opencv: .cid.opencv
+
+opencv_build:
+	@cd opencv; docker build -t joshuacox/image_receiver:opencvwatcher .
+
+opencv_clean:
+	-@docker kill `cat .cid.opencv`
+	-@docker rm `cat .cid.opencv`
+	-@rm .cid.opencv
+
+opencv_logs:
+	-@docker logs `cat .cid.opencv`
+
+opencv_exec:
+	-@docker exec -it `cat .cid.opencv` /bin/bash
+
+.cid.opencv: opencv_clean opencv_build
+	$(eval ID_U := $(shell id -u))
+	$(eval ID_G := $(shell id -g))
+	docker run \
+		-d \
+		-it \
+		-u ${ID_U}:${ID_G} \
+		-v `pwd`/opencvUploads:/opencvUploads \
+		-v `pwd`/srv:/srv \
+		--cidfile=.cid.opencv \
+		joshuacox/image_receiver:opencvwatcher
 
 .port.srv:
 	@while [ -z "$$PORTSRV" ]; do \
