@@ -10,23 +10,26 @@ if [ $# -ne 2 ]; then
 fi
 
 # Upload an image to this url
-THIS_URL=$(cat .host):$(cat .port)/post
+THIS_URL=$(cat .host):$(cat .port)
 # With this title
 THIS_TITLE=$(printf "name=%s" $1)
 # And this file
 if [ -f $2 ]; then
-  THIS_FILE=$(printf "image=@%s" $(realpath $2))
+ # THIS_FILE=$(printf "image=@%s" $(realpath $2))
+  THIS_FILE=$(printf "%s" $(realpath $2))
 else
   echo second argument must be a file
   exit 1
 fi
+    #-F "$THIS_TITLE" \
+    #-X "PUT" \
 
 main () {
-  echo curl -F $THIS_TITLE  -F $THIS_FILE $THIS_URL
+  #echo curl -F $THIS_TITLE  -F $THIS_FILE $THIS_URL/$THIS_TITLE.jpg
+  echo curl -T $THIS_FILE $THIS_URL/$THIS_TITLE.jpg
   curl -v \
-    -F "$THIS_TITLE" \
-    -F "$THIS_FILE" \
-    "$THIS_URL"
+    -T "$THIS_FILE" \
+    "$THIS_URL/$THIS_TITLE.jpg"
 }
 
 main
