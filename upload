@@ -21,8 +21,6 @@ else
   echo second argument must be a file
   exit 1
 fi
-    #-F "$THIS_TITLE" \
-    #-X "PUT" \
 
 main () {
   #echo curl -F $THIS_TITLE  -F $THIS_FILE $THIS_URL/$THIS_TITLE.jpg
