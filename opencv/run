@@ -1,0 +1,6 @@
+#!/bin/bash
+# https://pypi.org/project/watchdog/
+watchmedo shell-command \
+    --patterns="*.py;*.jpg" \
+    --recursive \
+    --command='echo "${watch_src_path}"'

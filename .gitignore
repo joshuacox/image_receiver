@@ -1,12 +1,8 @@
-.cid.python
-.cid.php
-.cid.js
-.cid.tf
-.cid.nginx
-.cid.watch
+.cid.*
 node_modules
 tmp
 srv
+opencvUploads
 .port
 .port.srv
 .user

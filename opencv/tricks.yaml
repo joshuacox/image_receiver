@@ -1,0 +1,6 @@
+tricks:
+- watchdog.tricks.LoggerTrick:
+    patterns: ["*.png", "*.jpg"]
+    hash_names: true
+    source_directory: /opencvUploads/
+    destination_directory: /srv/opencvout/
