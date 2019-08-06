@@ -23,12 +23,12 @@ FROM python:3
 
 WORKDIR /usr/src/app
 
-COPY --from=0 /usr/src/build/dist/flaskr-1.0.0-py3.7.egg .
-
 RUN apt-get update && apt-get install -y \
 	sqlite3 \
 	&& rm -rf /var/lib/apt/lists/*
 
+# For now we want to eliminate downloading pytorch twice
+COPY --from=0 /home/buildr /home/flask
 RUN useradd flask \
 && chown -R flask. /usr/src/app \
 && mkdir -p /home/flask \
@@ -39,6 +39,7 @@ RUN useradd flask \
 USER flask
 ENV FLASK_APP=flaskr
 
+COPY --from=0 /usr/src/build/dist/flaskr-1.0.0-py3.7.egg .
 COPY ./flaskr/requirements.txt ./
 RUN /bin/bash -l -c "source ~/.bashrc \
 && easy_install --user ./flaskr-1.0.0-py3.7.egg \
