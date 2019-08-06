@@ -7,7 +7,7 @@ RUN useradd buildr \
 && mkdir -p /home/buildr \
 && printf 'PATH=/home/buildr/.local/bin:$PATH' >> /home/buildr/.bashrc \
 && printf 'PATH=/home/buildr/.local/bin:$PATH' >> /home/buildr/.bash_profile \
-&& chown -R buildr. /home/flask
+&& chown -R buildr. /home/buildr
 
 USER buildr
 ENV FLASK_APP=flaskr
@@ -23,7 +23,7 @@ FROM python:3
 
 WORKDIR /usr/src/app
 
-COPY --from=0 /usr/srv/build/dist/flaskr-1.0.0-py3.7.egg .
+COPY --from=0 /usr/src/build/dist/flaskr-1.0.0-py3.7.egg .
 
 RUN apt-get update && apt-get install -y \
 	sqlite3 \
