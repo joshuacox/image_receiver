@@ -1,23 +1,19 @@
 #!/bin/bash
 : ${WATCHER_DEBUG:=false}
+mkdir -p /srv/opencvImages
 echo "Watching $1 on $(hostname)"
 
-mkindex () {
-    export IMAGE_TO_SERVE=$1
-    envsubst < /watcher/index.tpl > /srv/index.html
-    cp /srv/index.html /srv/$IMAGE_TO_SERVE.html
+observe () {
+  echo $1 received
 }
 
 inotifywait -m $1 -e close_write -e moved_to |
   while read path action file; do
     echo "The file '$file' appeared in directory '$path' via '$action'"
     FILE_TYPE=$( file -b $path$file|cut -f1 -d, )
-    this_uuid=$(uuidgen -r)
     if [[ $FILE_TYPE == "JPEG image data" ]]; then
-      mkdir -p /opencvUploads/$file
-      cp $path$file /opencvUploads/$this_uuid-$file
-      mv $path$file /srv/images/
-      mkindex $file
+      observe $path$file
+      mv $path$file /srv/opencvImages/
     else
       echo -n "file type was '$FILE_TYPE', "
       echo -n "$file Not JPEG, "
