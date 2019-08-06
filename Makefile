@@ -161,8 +161,8 @@ watch_logs:
 watch_exec:
 	-@docker exec -it `cat .cid.watch` /bin/bash
 
-.cid.watch:
-	$(eval ID_U := $(shell id -u))
+.cid.watch: .port.opencv
+	$(eval ID_U := $(shell id -u)) 
 	$(eval ID_G := $(shell id -g))
 	docker run \
 		-d \
@@ -171,6 +171,7 @@ watch_exec:
 		-v `pwd`/opencvUploads:/opencvUploads \
 		-v `pwd`/tmp:/tmp \
 		-v `pwd`/srv:/srv \
+		-p `cat .port.opencv`:80 \
 		-e 'WATCHER_DEBUG=true' \
 		--cidfile=.cid.watch \
 		joshuacox/watcher
@@ -202,6 +203,11 @@ opencv_exec:
 		-v `pwd`/srv:/srv \
 		--cidfile=.cid.opencv \
 		joshuacox/image_receiver:opencvwatcher
+
+.port.opencv:
+	@while [ -z "$$PORTOPENCV" ]; do \
+		read -r -p "Enter the port you wish to associate with this server container [PORTOPENCV]: " PORTOPENCV; echo "$$PORTOPENCV">>.port.opencv; cat .port.opencv; \
+	done ;
 
 .port.srv:
 	@while [ -z "$$PORTSRV" ]; do \
