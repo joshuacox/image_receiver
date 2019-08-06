@@ -22,7 +22,7 @@ ENV FLASK_APP=flaskr
 RUN /bin/bash -l -c "source ~/.bashrc \
 && pip3 install --user --no-cache-dir -r flaskr/requirements.txt \
 && python3 -m venv venv && . venv/bin/activate \
-&& python setup.py bdist_wheel"
+&& python3 setup.py bdist_wheel"
 
 FROM python:3
 
