@@ -1,6 +1,20 @@
 FROM python:3
 
+COPY . /usr/src/build
+WORKDIR /usr/src/build
+COPY ./flaskr/requirements.txt ./
+RUN /bin/bash -l -c "source ~/.bashrc \
+&& pip install --user --no-cache-dir -r requirements.txt \
+&& python3 -m venv venv && . venv/bin/activate \
+&& pip install --user --no-cache-dir flask \
+&& python setup.py bdist_egg"
+
+
+FROM python:3
+
 WORKDIR /usr/src/app
+
+COPY --from=0 /usr/srv/build/dist/flaskr-1.0.0-py3.7.egg .
 
 RUN apt-get update && apt-get install -y \
 	sqlite3 \
@@ -16,7 +30,6 @@ RUN useradd flask \
 USER flask
 ENV FLASK_APP=flaskr
 
-COPY ./dist/flaskr-1.0.0-py3.7.egg ./
 COPY ./flaskr/requirements.txt ./
 RUN /bin/bash -l -c "source ~/.bashrc \
 && easy_install --user ./flaskr-1.0.0-py3.7.egg \
