@@ -1,5 +1,9 @@
 FROM python:3
 
+RUN apt-get update && apt-get install -y \
+	sqlite3 \
+	&& rm -rf /var/lib/apt/lists/*
+
 COPY ./README.rst /usr/src/build/
 COPY ./MANIFEST.in /usr/src/build/
 COPY ./setup.py /usr/src/build/
@@ -14,12 +18,13 @@ RUN useradd buildr \
 && printf 'PATH=/home/buildr/.local/bin:$PATH' >> /home/buildr/.bash_profile \
 && chown -R buildr. /home/buildr
 
-
 USER buildr
 ENV FLASK_APP=flaskr
 
+# no venv
+# && python3 -m venv venv && . venv/bin/activate \
+
 RUN /bin/bash -l -c "source ~/.bashrc \
-&& python3 -m venv venv && . venv/bin/activate \
 && pip3 install --user --no-cache-dir wheel flask \
 && pip3 install --user --no-cache-dir -r flaskr/requirements.txt \
 && python3 setup.py bdist_wheel"
