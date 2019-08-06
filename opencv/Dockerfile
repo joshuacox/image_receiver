@@ -14,7 +14,7 @@ RUN useradd buildr \
 && printf 'PATH=/home/buildr/.local/bin:$PATH' >> /home/buildr/.bash_profile \
 && chown -R buildr. /home/buildr
 
-RUN pip3 install wheel pytorch flask
+RUN pip3 install wheel torch flask
 
 USER buildr
 ENV FLASK_APP=flaskr
