@@ -171,7 +171,7 @@ watch_exec:
 		-v `pwd`/opencvUploads:/opencvUploads \
 		-v `pwd`/tmp:/tmp \
 		-v `pwd`/srv:/srv \
-		-p `cat .port.opencv`:80 \
+		-p `cat .port.opencv`:8080 \
 		-e 'WATCHER_DEBUG=true' \
 		--cidfile=.cid.watch \
 		joshuacox/watcher
