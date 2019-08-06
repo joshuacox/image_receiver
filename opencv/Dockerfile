@@ -1,7 +1,6 @@
 FROM python:3
 
 COPY ./flaskr /usr/src/build/flaskr
-COPY ./flaskr.egg-info /usr/src/build/flaskr.egg-info
 COPY ./setup.py /usr/src/build/
 COPY ./setup.cfg /usr/src/build/
 COPY ./MANIFEST.in /usr/src/build/
