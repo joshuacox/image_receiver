@@ -3,7 +3,7 @@ FROM python:3
 COPY . /usr/src/build
 WORKDIR /usr/src/build
 RUN useradd buildr \
-&& chown -R buildr. /usr/src/app \
+&& chown -R buildr. /usr/src/build \
 && mkdir -p /home/buildr \
 && printf 'PATH=/home/buildr/.local/bin:$PATH' >> /home/buildr/.bashrc \
 && printf 'PATH=/home/buildr/.local/bin:$PATH' >> /home/buildr/.bash_profile \
