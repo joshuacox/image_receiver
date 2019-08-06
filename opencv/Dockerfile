@@ -53,7 +53,6 @@ ENV FLASK_APP=flaskr
 COPY --from=0 /usr/src/build/dist/flaskr-1.0.0-py2.py3-none-any.whl .
 COPY ./flaskr/requirements.txt ./
 RUN /bin/bash -l -c "source ~/.bashrc \
-&& python3 -m venv venv && . venv/bin/activate \
 && pip3 install --user --no-cache-dir waitress \
 && pip3 install --user --no-cache-dir -r requirements.txt \
 && pip3 install --user --no-cache-dir ./flaskr-1.0.0-py2.py3-none-any.whl"
