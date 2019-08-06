@@ -2,13 +2,22 @@ FROM python:3
 
 COPY . /usr/src/build
 WORKDIR /usr/src/build
+RUN useradd buildr \
+&& chown -R buildr. /usr/src/app \
+&& mkdir -p /home/buildr \
+&& printf 'PATH=/home/buildr/.local/bin:$PATH' >> /home/buildr/.bashrc \
+&& printf 'PATH=/home/buildr/.local/bin:$PATH' >> /home/buildr/.bash_profile \
+&& chown -R buildr. /home/flask
+
+USER buildr
+ENV FLASK_APP=flaskr
+
 COPY ./flaskr/requirements.txt ./
 RUN /bin/bash -l -c "source ~/.bashrc \
 && pip install --user --no-cache-dir -r requirements.txt \
 && python3 -m venv venv && . venv/bin/activate \
 && pip install --user --no-cache-dir flask \
 && python setup.py bdist_egg"
-
 
 FROM python:3
 
