@@ -4,6 +4,7 @@ RUN apt-get update && apt-get install -y \
 	sqlite3 \
 	&& rm -rf /var/lib/apt/lists/*
 
+COPY ./LICENSE /usr/src/build/
 COPY ./README.rst /usr/src/build/
 COPY ./MANIFEST.in /usr/src/build/
 COPY ./setup.py /usr/src/build/
