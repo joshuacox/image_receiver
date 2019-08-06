@@ -18,9 +18,9 @@ USER buildr
 ENV FLASK_APP=flaskr
 
 RUN /bin/bash -l -c "source ~/.bashrc \
-&& pip install --user --no-cache-dir -r flaskr/requirements.txt \
+&& pip3 install --user --no-cache-dir -r flaskr/requirements.txt \
 && python3 -m venv venv && . venv/bin/activate \
-&& pip install --user --no-cache-dir flask wheel \
+&& pip3 install --user --no-cache-dir flask wheel \
 && python setup.py bdist_wheel"
 
 FROM python:3
@@ -46,9 +46,9 @@ ENV FLASK_APP=flaskr
 COPY --from=0 /usr/src/build/dist/flaskr-1.0.0-py2.py3-none-any.whl .
 COPY ./flaskr/requirements.txt ./
 RUN /bin/bash -l -c "source ~/.bashrc \
-&& pip install --user --no-cache-dir ./flaskr-1.0.0-py2.py3-none-any.whl \
-&& pip install --user --no-cache-dir waitress \
-&& pip install --user --no-cache-dir -r requirements.txt \
+&& pip3 install --user --no-cache-dir ./flaskr-1.0.0-py2.py3-none-any.whl \
+&& pip3 install --user --no-cache-dir waitress \
+&& pip3 install --user --no-cache-dir -r requirements.txt \
 && python3 -m venv venv && . venv/bin/activate"
 
 COPY flaskr/imagenet_class_index.json ./
