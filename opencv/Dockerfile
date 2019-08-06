@@ -1,9 +1,11 @@
 FROM python:3
 
-COPY ./flaskr /usr/src/build/flaskr
+COPY ./README.rst /usr/src/build/
+COPY ./MANIFEST.in /usr/src/build/
 COPY ./setup.py /usr/src/build/
 COPY ./setup.cfg /usr/src/build/
-COPY ./MANIFEST.in /usr/src/build/
+COPY ./flaskr /usr/src/build/flaskr
+COPY ./tests /usr/src/build/
 WORKDIR /usr/src/build
 RUN useradd buildr \
 && chown -R buildr. /usr/src/build \
