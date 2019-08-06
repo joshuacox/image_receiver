@@ -15,8 +15,8 @@ WORKDIR /usr/src/build
 RUN useradd buildr \
 && chown -R buildr. /usr/src/build \
 && mkdir -p /home/buildr \
-&& printf 'PATH=/home/buildr/.local/bin:$PATH' >> /home/buildr/.bashrc \
-&& printf 'PATH=/home/buildr/.local/bin:$PATH' >> /home/buildr/.bash_profile \
+&& echo 'PATH=/home/buildr/.local/bin:$PATH' >> /home/buildr/.bashrc \
+&& echo 'PATH=/home/buildr/.local/bin:$PATH' >> /home/buildr/.bash_profile \
 && chown -R buildr. /home/buildr
 
 USER buildr
@@ -43,8 +43,8 @@ COPY --from=0 /home/buildr /home/flask
 RUN useradd flask \
 && chown -R flask. /usr/src/app \
 && mkdir -p /home/flask \
-&& printf 'PATH=/home/flask/.local/bin:$PATH' >> /home/flask/.bashrc \
-&& printf 'PATH=/home/flask/.local/bin:$PATH' >> /home/flask/.bash_profile \
+&& echo 'PATH=/home/flask/.local/bin:$PATH' >> /home/flask/.bashrc \
+&& echo 'PATH=/home/flask/.local/bin:$PATH' >> /home/flask/.bash_profile \
 && chown -R flask. /home/flask
 
 USER flask
@@ -52,7 +52,8 @@ ENV FLASK_APP=flaskr
 
 COPY --from=0 /usr/src/build/dist/flaskr-1.0.0-py2.py3-none-any.whl .
 COPY ./flaskr/requirements.txt ./
-RUN /bin/bash -l -c "source ~/.bashrc \
+RUN echo $PATH
+RUN /bin/bash -l -c "source /home/flask/.bashrc \
 && pip3 install --user --no-cache-dir waitress \
 && pip3 install --user --no-cache-dir -r requirements.txt \
 && pip3 install --user --no-cache-dir ./flaskr-1.0.0-py2.py3-none-any.whl"
