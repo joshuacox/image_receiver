@@ -1,6 +1,10 @@
 FROM python:3
 
-COPY . /usr/src/build
+COPY ./flaskr /usr/src/build/flaskr
+COPY ./flaskr.egg-info /usr/src/build/flaskr.egg-info
+COPY ./setup.py /usr/src/build/
+COPY ./setup.cfg /usr/src/build/
+COPY ./MANIFEST.in /usr/src/build/
 WORKDIR /usr/src/build
 RUN useradd buildr \
 && chown -R buildr. /usr/src/build \
@@ -12,12 +16,11 @@ RUN useradd buildr \
 USER buildr
 ENV FLASK_APP=flaskr
 
-COPY ./flaskr/requirements.txt ./
 RUN /bin/bash -l -c "source ~/.bashrc \
-&& pip install --user --no-cache-dir -r requirements.txt \
+&& pip install --user --no-cache-dir -r flaskr/requirements.txt \
 && python3 -m venv venv && . venv/bin/activate \
-&& pip install --user --no-cache-dir flask \
-&& python setup.py bdist_egg"
+&& pip install --user --no-cache-dir flask wheel \
+&& python setup.py bdist_wheel"
 
 FROM python:3
 
@@ -39,10 +42,10 @@ RUN useradd flask \
 USER flask
 ENV FLASK_APP=flaskr
 
-COPY --from=0 /usr/src/build/dist/flaskr-1.0.0-py3.7.egg .
+COPY --from=0 /usr/src/build/dist/flaskr-1.0.0-py2.py3-none-any.whl .
 COPY ./flaskr/requirements.txt ./
 RUN /bin/bash -l -c "source ~/.bashrc \
-&& easy_install --user ./flaskr-1.0.0-py3.7.egg \
+&& pip install --user --no-cache-dir ./flaskr-1.0.0-py2.py3-none-any.whl \
 && pip install --user --no-cache-dir waitress \
 && pip install --user --no-cache-dir -r requirements.txt \
 && python3 -m venv venv && . venv/bin/activate"
