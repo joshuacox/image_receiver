@@ -60,4 +60,4 @@ RUN /bin/bash -l -c "source /home/flask/.bashrc \
 
 COPY flaskr/imagenet_class_index.json ./
 COPY ./start.sh ./
-ENTRYPOINT [ "/bin/bash", "./start.sh" ]
+ENTRYPOINT [ "su", "-l", "flask", "-c", "/bin/bash /usr/src/app/start.sh" ]
