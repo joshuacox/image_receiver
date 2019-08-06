@@ -1,6 +1,6 @@
 all: gatherinfo opencvUploads tmp srv build run watch serve opencv
 
-gatherinfo: .port .port.opencv .port.srv
+gatherinfo: .host .port .port.opencv .port.srv
 
 tmp:
 	@mkdir tmp
