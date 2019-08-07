@@ -1,6 +1,6 @@
 all: gatherinfo opencvUploads tmp srv build run watch serve opencv
 
-gatherinfo: .host .port .port.opencv .port.srv .user .pass
+gatherinfo: .host .port .port.opencv .port.srv .user .pass .network .network-created
 
 tmp:
 	@mkdir tmp
@@ -40,6 +40,7 @@ php: .cid.php
 		-it \
 		--cidfile=.cid.php \
 		-d \
+		--net=`cat .network` \
 		-p `cat .port`:80 \
 		-v `pwd`/tmp:/var/www/html/tmp \
 		joshuacox/image_receiver:phplistener
@@ -54,6 +55,7 @@ php: .cid.php
 		--cidfile=.cid.js \
 		-d \
 		-u ${ID_U}:${ID_G} \
+		--net=`cat .network` \
 		-p `cat .port`:8080 \
 		-v `pwd`/tmp:/tmp \
 		joshuacox/image_receiver:jslistener
@@ -66,6 +68,7 @@ php: .cid.php
 		--cidfile=.cid.python \
 		-d \
 		-u ${ID_U}:${ID_G} \
+		--net=`cat .network` \
 		-p `cat .port`:8888 \
 		-v `pwd`/tmp:/tmp \
 		joshuacox/image_receiver:pythonlistener
@@ -121,6 +124,7 @@ tensorflow: .cid.tf
 		-it \
 		-p 8888:8888 \
 		--cidfile=.cid.tf \
+		--net=`cat .network` \
 		-v `pwd`/tmp:/tmp \
 		-u ${ID_U}:${ID_G} \
 		tensorflow/tensorflow:latest-py3-jupyter \
@@ -133,6 +137,7 @@ serve: serve_clean .cid.nginx
 		-d \
 		-it \
 		--name nginx-tiny-proxy \
+		--net=`cat .network` \
 		-e 'NGINX_TEMPLATE=default' \
 		-e "NGINX_AUTH=true" \
 		-e "NGINX_USER=`cat .user`" \
@@ -175,6 +180,7 @@ watch_exec:
 		-v `pwd`/opencvUploads:/opencvUploads \
 		-v `pwd`/tmp:/tmp \
 		-v `pwd`/srv:/srv \
+		--net=`cat .network` \
 		-e 'WATCHER_DEBUG=true' \
 		--cidfile=.cid.watch \
 		joshuacox/watcher
@@ -206,6 +212,7 @@ opencv_exec:
 		-v `pwd`/opencvUploads:/opencvUploads \
 		-p `cat .port.opencv`:8080 \
 		-v `pwd`/srv:/srv \
+		--net=`cat .network` \
 		--cidfile=.cid.opencv \
 		joshuacox/image_receiver:opencvwatcher
 
@@ -238,3 +245,11 @@ opencv_exec:
 	@while [ -z "$$NGINX_PASS" ]; do \
 		read -r -p "Enter the pass you wish to associate with this server container [NGINX_PASS]: " NGINX_PASS; echo "$$NGINX_PASS">>.pass; cat .pass; \
 	done ;
+
+.network:
+	@while [ -z "$$DOCKER_NETWORK" ]; do \
+		read -r -p "Enter the network you wish to associate with this server container [DOCKER_NETWORK]: " DOCKER_NETWORK; echo "$$DOCKER_NETWORK">>.network; cat .network; \
+	done ;
+
+.network-created:
+	docker network create `cat .network`
