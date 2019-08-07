@@ -132,6 +132,7 @@ serve: serve_clean .cid.nginx
 	docker run \
 		-d \
 		-it \
+		--name nginx-tiny-proxy \
 		-e 'NGINX_TEMPLATE=default' \
 		-e "NGINX_AUTH=true" \
 		-e "NGINX_USER=`cat .user`" \
@@ -169,6 +170,7 @@ watch_exec:
 	docker run \
 		-d \
 		-it \
+		--name watcher \
 		-u ${ID_U}:${ID_G} \
 		-v `pwd`/opencvUploads:/opencvUploads \
 		-v `pwd`/tmp:/tmp \
@@ -199,6 +201,7 @@ opencv_exec:
 	docker run \
 		-d \
 		-it \
+		--name opencvwatcher \
 		-u ${ID_U}:${ID_G} \
 		-v `pwd`/opencvUploads:/opencvUploads \
 		-p `cat .port.opencv`:8080 \
