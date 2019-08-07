@@ -1,4 +1,4 @@
-all: gatherinfo opencvUploads tmp srv build run watch serve opencv
+all: gatherinfo tmp srv build run watch serve opencv
 
 gatherinfo: .host .port .port.opencv .port.srv .user .pass .network .network-created
 
@@ -8,9 +8,6 @@ tmp:
 
 srv:
 	@mkdir -p srv/images
-
-opencvUploads:
-	@mkdir -p opencvUploads
 
 CURRENT_LANG=python
 
@@ -177,7 +174,6 @@ watch_exec:
 		-it \
 		--name watcher \
 		-u ${ID_U}:${ID_G} \
-		-v `pwd`/opencvUploads:/opencvUploads \
 		-v `pwd`/tmp:/tmp \
 		-v `pwd`/srv:/srv \
 		--net=`cat .network` \
@@ -209,7 +205,6 @@ opencv_exec:
 		-it \
 		--name opencvwatcher \
 		-u ${ID_U}:${ID_G} \
-		-v `pwd`/opencvUploads:/opencvUploads \
 		-p `cat .port.opencv`:8080 \
 		-v `pwd`/srv:/srv \
 		--net=`cat .network` \
