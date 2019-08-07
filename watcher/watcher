@@ -14,8 +14,13 @@ inotifywait -m $1 -e close_write -e moved_to |
     FILE_TYPE=$( file -b $path$file|cut -f1 -d, )
     this_uuid=$(uuidgen -r)
     if [[ $FILE_TYPE == "JPEG image data" ]]; then
-      mkdir -p /opencvUploads/$file
-      cp $path$file /opencvUploads/$this_uuid-$file
+      curl -X POST \
+        -F "file=@$path$file" \
+        --max-time 33 \
+        http://opencvwatcher:8080/predict \
+        > /srv/images/$file.json
+      #mkdir -p /opencvUploads/$file
+      #cp $path$file /opencvUploads/$this_uuid-$file
       mv $path$file /srv/images/
       mkindex $file
     else
