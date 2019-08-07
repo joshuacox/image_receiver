@@ -253,3 +253,4 @@ opencv_exec:
 
 .network-created:
 	docker network create `cat .network`
+	date -I > .network-created
